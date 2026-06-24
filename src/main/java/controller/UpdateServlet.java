@@ -1,5 +1,8 @@
 package controller;
 
+import java.io.IOException;
+
+import entity.Student;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -7,42 +10,36 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.StudentDAO;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-//import java.util.List;
-
-import entity.Student;
-
-@WebServlet("/abc")
-public class SimpleServlet extends HttpServlet {
+@WebServlet("/update")
+public class UpdateServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private StudentDAO dao = new StudentDAO();
 
-	public SimpleServlet() {
-
+	public UpdateServlet() {
 	}
+
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		
-		
+		int id = Integer.parseInt(request.getParameter("id"));
+		Student student = dao.getOne(id);
+		request.setAttribute("Student", student);
+		request.getRequestDispatcher("update.jsp").forward(request, response);
+
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
+		int id = Integer.parseInt(request.getParameter("id"));
 		String name = request.getParameter("nm");
 		int age = Integer.parseInt(request.getParameter("age"));
 		String course = request.getParameter("course");
-		
-		StudentDAO dao = new StudentDAO();
-		Student st = new Student(name, age, course);
-		int i = dao.insert(st);
-		PrintWriter out=response.getWriter();
-		if(i != 0) {
+
+		Student student = new Student(id, name, age, course);
+		int i = dao.updateStudent(student);
+		if (i != 0) {
 			response.sendRedirect("Read");
-			//request.getRequestDispatcher("Read").forward(request, response);
-			//response.sendRedirect("form.html");
 		} else {
-			out.println("<h1> Something went wrong </h1>");
+			System.out.println("Something went wrong...");
 		}
 	}
 
